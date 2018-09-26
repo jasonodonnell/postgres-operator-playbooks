@@ -1,0 +1,42 @@
+# main.yml
+---
+- include_tasks: check_openshift.yml
+  when: openshift_host is defined and openshift_host != ''
+
+- include_tasks: check_kubernetes.yml
+  when: kubernetes_context is defined and kubernetes_context != ''
+
+- name: Check if inventory file variables are defined
+  fail: msg="Please specify the value of {{item}} in your inventory file"
+  when: "{{item}} is undefined or {{item}} == ''"
+  with_items:
+    - pgo_username
+    - pgo_password
+    - ccp_image_prefix
+    - ccp_image_tag 
+    - co_image_prefix
+    - co_image_tag
+    - auto_failover
+    - backrest 
+    - badger
+    - metrics
+    - archive_mode 
+    - archive_timeout
+    - auto_failover_sleep_secs
+    - db_password_age_days
+    - db_password_length
+    - db_port
+    - db_replicas
+    - db_user
+    - backup_storage
+    - primary_storage
+    - replica_storage
+    - storage1_access_mode 
+    - storage1_size
+    - storage1_type
+    - storage2_access_mode 
+    - storage2_size
+    - storage2_type
+    - storage3_access_mode 
+    - storage3_size
+    - storage3_type
