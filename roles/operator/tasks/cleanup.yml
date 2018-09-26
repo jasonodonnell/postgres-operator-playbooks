@@ -1,0 +1,86 @@
+---
+- name: Use kubectl or oc
+  set_fact:
+    kubectl_or_oc: "{{ openshift_oc_bin if openshift_oc_bin is defined else 'kubectl' }}"
+
+- name: Delete existing Deployment
+  shell: |
+    {{ kubectl_or_oc }} delete deployment \
+      postgres-operator -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing ConfigMaps
+  shell: |
+    {{ kubectl_or_oc }} delete configmap \
+      operator-conf pgo-pgbackrest-config -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Secrets
+  shell: |
+    {{ kubectl_or_oc }} delete secret \
+      apiserver-conf-secret -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Services
+  shell: |
+    {{ kubectl_or_oc }} delete service \
+      postgres-operator -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Service Account
+  shell: |
+    {{ kubectl_or_oc }} delete serviceaccount \
+      postgres-operator -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Cluster Roles
+  shell: |
+    {{ kubectl_or_oc }} delete clusterrole \
+      pgopclusterrole pgopclusterrolecrd -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Role
+  shell: |
+    {{ kubectl_or_oc }} delete role \
+      pgo-role -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Custom Objects
+  shell: |
+    {{ kubectl_or_oc }} delete \
+      pgreplicas,pgbackups,pgclusters,pgpolicies,pgupgrades,pgtasks,pgingests \
+      -n {{ kubernetes_namespace }} --all
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing CRDs
+  shell: |
+    {{ kubectl_or_oc }} delete crd \
+      pgbackups.cr.client-go.k8s.io pgreplicas.cr.client-go.k8s.io \
+      pgclusters.cr.client-go.k8s.io pgpolicies.cr.client-go.k8s.io \
+      pgtasks.cr.client-go.k8s.io pgtasks.cr.client-go.k8s.io \
+      pgupgrades.cr.client-go.k8s.io pgingests.cr.client-go.k8s.io \
+     -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Remove Data Jobs
+  shell: |
+    {{ kubectl_or_oc }} delete jobs \
+      --selector=pgrmdata=true -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Backup Jobs
+  shell: |
+    {{ kubectl_or_oc }} delete jobs \
+      --selector=pgbackup=true -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true

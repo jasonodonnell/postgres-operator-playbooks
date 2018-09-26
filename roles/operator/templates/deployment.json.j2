@@ -1,0 +1,120 @@
+{
+    "apiVersion": "extensions/v1beta1",
+    "kind": "Deployment",
+    "metadata": {
+        "name": "postgres-operator"
+    },
+    "spec": {
+        "replicas": 1,
+        "template": {
+            "metadata": {
+                "labels": {
+                    "name": "postgres-operator"
+                }
+            },
+            "spec": {
+                "serviceAccountName": "postgres-operator",
+                "containers": [
+                    {
+                        "name": "apiserver",
+                        "image": "{{ co_image_prefix }}/pgo-apiserver:{{ co_image_tag }}",
+                        "imagePullPolicy": "IfNotPresent",
+                        "ports": [
+                            {
+                                "containerPort": 8443
+                            }
+                        ],
+                        "env": [
+                            {
+                                "name": "CRUNCHY_DEBUG",
+                                "value": "false"
+                            },
+                            {
+                                "name": "PORT",
+                                "value": "8443"
+                            },
+                            {
+                                "name": "NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "TLS_NO_VERIFY",
+                                "value": "false"
+                            }
+                        ],
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/config",
+                                "name": "apiserver-conf",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/operator-conf",
+                                "name": "operator-conf",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "name": "operator",
+                        "image": "{{ co_image_prefix }}/postgres-operator:{{ co_image_tag }}",
+                        "imagePullPolicy": "IfNotPresent",
+                        "env": [
+                            {
+                                "name": "CRUNCHY_DEBUG",
+                                "value": "{{ crunchy_debug }}"
+                            },
+                            {
+                                "name": "NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "MY_POD_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/operator-conf",
+                                "name": "operator-conf",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/config",
+                                "name": "apiserver-conf",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "operator-conf",
+                        "configMap": {
+                            "name": "operator-conf"
+                        }
+                    },
+                    {
+                        "name": "apiserver-conf",
+                        "secret": {
+                            "secretName": "apiserver-conf-secret",
+                            "defaultMode": 511
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

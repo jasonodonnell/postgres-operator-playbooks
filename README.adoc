@@ -9,26 +9,43 @@ Latest Release: 3.3.0 {docdate}
 
 == General
 
-Ansible Playbooks for the Crunchy PostgreSQL Operator
-
-Please view the official Crunchy Data PostgreSQL Operator documentation link:https://crunchydata.github.io/postgres-operator/[here]. If you are
-interested in contributing or making an update to the documentation, please view the link:https://crunchydata.github.io/postgres-operator/contributing/[Contributing Guidelines].
-
-[link=https://crunchydata.github.io/postgres-operator/]
-image::btn.png[Official Documentation]
+This repository contains Ansible Roles for deploying the Crunchy PostgreSQL Operator 
+for Kubernetes and OpenShift.
 
 == Installation
 
-To build and deploy the Operator on your Kubernetes system, follow the instructions documented on the link:https://crunchydata.github.io/postgres-operator/installation/[Installation] page.
+The following are required for installation using these roles:
 
-If you're seeking to upgrade your existing Operator installation, please visit the link:https://crunchydata.github.io/postgres-operator/installation/upgrading-the-operator/[Upgrading the Operator] page.  Also read the Release Notes as to details on recent changes to the Operator.
+* Ansible 2.4.6+
+* [PostgreSQL Operator Client](https://github.com/CrunchyData/postgres-operator/releases) (pgo) installed.
+* PostgreSQL Operator Docker Images
+  * CentOS7 images can be found in Docker Hub, RHEL7 images are available to Crunchy customers
 
-More design information is found on the link:https://crunchydata.github.io/postgres-operator/how-it-works/[How It Works] page.
 
-== Configuration
+Next, edit the `inventory` file included to configure the Crunchy PostgreSQL Operator installation.
 
-The operator is template-driven; this makes it simple to configure both the client and the operator. The configuration options are documented on the link:https://crunchydata.github.io/postgres-operator/installation/configuration/[Configuration] page.
+Once the `inventory` file has been configured, run the following command to deploy:
 
-== Getting Started
+....
+ansible-playbook -i inventory install.yml
+....
 
-*postgres-operator* commands are documented on the link:https://crunchydata.github.io/postgres-operator/getting-started/[Getting Started] page.
+After installation completes, set the following environment variables for `pgo` to work correctly:
+
+....
+export PGO_CA_CERT=/tmp/pgo-config/pg-operator.crt
+export PGO_CLIENT_CERT=/tmp/pgo-config/pg-operator.crt
+export PGO_CLIENT_KEY=/tmp/pgo-config/privkey.pem
+export URL=$(kubectl get service postgres-operator -o=jsonpath="{.spec.clusterIP}")
+export CO_APISERVER_URL=https://${URL?}:8443'
+....
+
+Finally, test `pgo` is communicating with the PostgreSQL Operator API Service:
+
+....
+pgo version
+....
+
+== More Information
+
+Please view the official Crunchy Data PostgreSQL Operator documentation link:https://crunchydata.github.io/postgres-operator/[here].

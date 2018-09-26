@@ -1,0 +1,12 @@
+---
+crunchy_debug: "false"
+
+kubernetes_deployment_name: "pgo"
+kubernetes_base_path: "{{ local_base_config_path|default('/tmp') }}/{{ kubernetes_deployment_name }}-config"
+
+storage1_supplemental_groups: ''
+storage1_fs_group: ''
+storage2_supplemental_groups: ''
+storage2_fs_group: ''
+storage3_supplemental_groups: ''
+storage3_fs_group: ''

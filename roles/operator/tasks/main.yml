@@ -1,0 +1,123 @@
+---
+- fail:
+    msg: "Only set one of kubernetes_context or openshift_host"
+  when: openshift_host is defined and kubernetes_context is defined
+
+- include_tasks: "{{ tasks }}"
+  with_items:
+    - openshift_auth.yml
+    - openshift.yml
+  loop_control:
+    loop_var: tasks
+  when: openshift_host is defined
+
+- include_tasks: "{{ tasks }}"
+  with_items:
+    - kubernetes_auth.yml
+    - kubernetes.yml
+  loop_control:
+    loop_var: tasks
+  when: kubernetes_context is defined
+
+- include_tasks: certs.yml
+- include_tasks: cleanup.yml
+
+- name: Use kubectl or oc
+  set_fact:
+    kubectl_or_oc: "{{ openshift_oc_bin if openshift_oc_bin is defined else 'kubectl' }}"
+
+- name: Deploy PostgreSQL Operator (OpenShift)
+  block:
+    - name: Create PGO CRDs
+      shell: |
+        {{ kubectl_or_oc }} create -f \
+          {{ role_path }}/files/crd.yaml -n {{ kubernetes_namespace }}
+
+    - name: Template Cluster RBAC
+      template:
+        src: cluster-rbac.yaml.j2
+        dest: "{{ kubernetes_base_path }}/cluster-rbac.yaml"
+        mode: '0600'
+
+    - name: Create Cluster RBAC
+      shell: |
+        {{ kubectl_or_oc }} create -f \
+          {{ kubernetes_base_path }}/cluster-rbac.yaml -n {{ kubernetes_namespace }}
+    
+    - name: Template PGO RBAC
+      template:
+        src: rbac.yaml.j2
+        dest: "{{ kubernetes_base_path }}/rbac.yaml"
+        mode: '0600'
+
+    - name: Create PGO RBAC
+      shell: |
+        {{ kubectl_or_oc }} create -f \
+          {{ kubernetes_base_path }}/rbac.yaml -n {{ kubernetes_namespace }}
+
+    - name: Template PGO User
+      template:
+        src: pgouser.j2
+        dest: "{{ kubernetes_base_path }}/pgouser"
+        mode: '0600'
+
+    - name: Template Local PGO User
+      template:
+        src: pgouser.local.j2
+        dest: "~/.pgouser"
+        mode: '0400'
+
+    - name: Template PGO Configuration
+      template:
+        src: pgo.yaml.j2
+        dest: "{{ kubernetes_base_path }}/pgo.yaml"
+        mode: '0600'
+
+    - name: Create PGO API Secret
+      shell: |
+        {{ kubectl_or_oc }} create secret generic apiserver-conf-secret \
+          --from-file=server.crt='{{ kubernetes_base_path }}/pg-operator.crt' \
+          --from-file=server.key='{{ kubernetes_base_path }}/privkey.pem' \
+          --from-file=pgo.yaml='{{ kubernetes_base_path }}/pgo.yaml' \
+          --from-file=pgouser='{{ kubernetes_base_path }}/pgouser' \
+          --from-file=pgorole='{{ role_path }}/files/pgorole' \
+          --from-file=pgo.load-template.json='{{ role_path }}/files/pgo.load-template.json' \
+          --from-file=pgo.lspvc-template.json='{{ role_path }}/files/pgo.lspvc-template.json' \
+          -n {{ kubernetes_namespace }}
+
+    - name: Create PGO ConfigMap
+      shell: |
+        {{ kubectl_or_oc }} create configmap operator-conf \
+          --from-file='{{ role_path }}/files/operator-configs/backrest-job.json' \
+          --from-file='{{ role_path }}/files/operator-configs/backrest-restore-configmap.json' \
+          --from-file='{{ role_path }}/files/operator-configs/backrest-restore-job.json' \
+          --from-file='{{ role_path }}/files/operator-configs/backup-job.json' \
+          --from-file='{{ role_path }}/files/operator-configs/pgo-ingest-watch-job.json' \
+          --from-file='{{ role_path }}/files/operator-configs/pvc.json' \
+          --from-file='{{ role_path }}/files/operator-configs/pvc-matchlabels.json' \
+          --from-file='{{ role_path }}/files/operator-configs/pvc-storageclass.json' \
+          --from-file='{{ role_path }}/files/operator-configs/rmdata-job.json' \
+          --from-file='{{ role_path }}/files/operator-configs/cluster/1' \
+          -n {{ kubernetes_namespace }}
+
+    - name: Create pgBackRest ConfigMap
+      shell: |
+        {{ kubectl_or_oc }} create configmap pgo-pgbackrest-config \
+          --from-file='{{ role_path }}/files/pgbackrest.conf' \
+          -n {{ kubernetes_namespace }}
+
+    - name: Create PGO Service
+      shell: |
+        {{ kubectl_or_oc }} create --filename='{{ role_path }}/files/service.json' \
+          -n {{ kubernetes_namespace }}
+
+    - name: Template PGO Deployment
+      template:
+        src: deployment.json.j2
+        dest: "{{ kubernetes_base_path }}/deployment.yaml"
+        mode: '0600'
+
+    - name: Deploy PGO
+      shell: |
+        {{ openshift_oc_bin }} create --filename={{ kubernetes_base_path }}/deployment.yaml \
+          -n {{ kubernetes_namespace }}

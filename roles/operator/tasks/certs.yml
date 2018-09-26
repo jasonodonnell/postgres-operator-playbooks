@@ -1,0 +1,30 @@
+---
+- name: Ensure directory exists for local self-signed TLS certs.
+  file:
+    path: '{{ kubernetes_base_path }}'
+    state: directory
+
+- name: Generate RSA Key
+  command: openssl genrsa \
+    -out "{{ kubernetes_base_path }}/privkey.pem" 2048
+  args:
+    creates: "{{ kubernetes_base_path }}/privkey.pem"
+
+- name: Generate CSR
+  command: openssl req \
+    -new \
+    -subj '/C=US/ST=SC/L=Charleston/O=CrunchyData/CN=pg-operator' \
+    -key "{{ kubernetes_base_path }}/privkey.pem" \
+    -out "{{ kubernetes_base_path }}/pg-operator.csr"
+  args:
+    creates: "{{ kubernetes_base_path }}/pg-operator.csr"
+
+- name: Generate Self-signed Certificate
+  command: openssl req \
+    -x509 \
+    -days 1825 \
+    -key "{{ kubernetes_base_path }}/privkey.pem" \
+    -in "{{ kubernetes_base_path }}/pg-operator.csr" \
+    -out "{{ kubernetes_base_path }}/pg-operator.crt"
+  args:
+    creates: "{{ kubernetes_base_path }}/pg-operator.crt"
