@@ -12,6 +12,7 @@
 	}
     },
     "spec": {
+	"backoffLimit": 0,
         "template": {
             "metadata": {
                 "name": "rmdata-{{.Name}}",
@@ -41,6 +42,7 @@
                         "name": "pgdata",
                         "readOnly": false
                     }],
+		    {{.ContainerResources }}
                     "env": [{
                         "name": "DATA_ROOT",
                         "value": "{{.DataRoot}}"

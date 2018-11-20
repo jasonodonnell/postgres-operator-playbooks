@@ -1,0 +1,2 @@
+roles/operator/files/pgo-configs/server.crt
+roles/operator/files/pgo-configs/server.key

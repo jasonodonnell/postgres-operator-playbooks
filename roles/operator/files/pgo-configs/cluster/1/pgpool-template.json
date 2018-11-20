@@ -14,19 +14,20 @@
             "metadata": {
                 "labels": {
                     "name": "{{.Name}}",
-                    "crunchy-pgbouncer": "true",
+                    "crunchy-pgpool": "true",
                     "pg-cluster": "{{.ClusterName}}"
                 }
             },
             "spec": {
 
                 "containers": [{
-                    "name": "pgbouncer",
-                    "image": "{{.CCPImagePrefix}}/crunchy-pgbouncer:{{.CCPImageTag}}",
+                    "name": "pgpool",
+                    "image": "{{.CCPImagePrefix}}/crunchy-pgpool:{{.CCPImageTag}}",
                     "ports": [{
                         "containerPort": {{.Port}},
                         "protocol": "TCP"
                     }],
+		    {{.ContainerResources }}
                     "env": [{
                         "name": "PG_USERNAME",
                         "value": "testuser"
@@ -41,13 +42,13 @@
                         "value": "{{.ReplicaServiceName}}"
                     }],
                     "volumeMounts": [{
-                        "name": "pgbouncer-conf",
-                        "mountPath": "/pgconf/",
+                        "name": "pgpool-conf",
+                        "mountPath": "/pgconf/pgpoolconfigdir",
                         "readOnly": false
                     }]
                 }],
                 "volumes": [{
-                "name": "pgbouncer-conf",
+                "name": "pgpool-conf",
                 "secret": {
                     "secretName": "{{.SecretsName}}",
                     "defaultMode": 511
