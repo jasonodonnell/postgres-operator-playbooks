@@ -3,24 +3,24 @@
   set_fact:
     kubectl_or_oc: "{{ openshift_oc_bin if openshift_oc_bin is defined else 'kubectl' }}"
 
-- name: Delete existing Deployment
+- name: Delete existing Deployments
   shell: |
     {{ kubectl_or_oc }} delete deployment \
-      postgres-operator -n {{ kubernetes_namespace }}
+      postgres-operator crunchy-scheduler -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
 - name: Delete existing ConfigMaps
   shell: |
     {{ kubectl_or_oc }} delete configmap \
-      operator-conf pgo-pgbackrest-config -n {{ kubernetes_namespace }}
+      pgo-config pgo-pgbackrest-config -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
 - name: Delete existing Secrets
   shell: |
     {{ kubectl_or_oc }} delete secret \
-      apiserver-conf-secret -n {{ kubernetes_namespace }}
+      pgo-auth-secret -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
@@ -34,14 +34,28 @@
 - name: Delete existing Service Account
   shell: |
     {{ kubectl_or_oc }} delete serviceaccount \
-      postgres-operator -n {{ kubernetes_namespace }}
+      postgres-operator scheduler-sa -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Cluster Role Bindings
+  shell: |
+    {{ kubectl_or_oc }} delete clusterrolebinding \
+      pgopclusterbinding pgopclusterbindingcrd scheduler-sa -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
 - name: Delete existing Cluster Roles
   shell: |
     {{ kubectl_or_oc }} delete clusterrole \
-      pgopclusterrole pgopclusterrolecrd -n {{ kubernetes_namespace }}
+      pgopclusterrole pgopclusterrolecrd scheduler-sa -n {{ kubernetes_namespace }}
+  ignore_errors: yes
+  no_log: true
+
+- name: Delete existing Role Binding
+  shell: |
+    {{ kubectl_or_oc }} delete rolebinding \
+      pgo-role-binding -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 

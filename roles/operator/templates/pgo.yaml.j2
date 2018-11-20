@@ -17,6 +17,8 @@ Cluster:
   ArchiveMode:  {{ archive_mode }}
   ArchiveTimeout:  {{ archive_timeout }}
   ServiceType:  ClusterIP
+  LogStatement: {{ log_statement }}
+  LogMinDurationStatement:  {{ log_min_duration_statement }}
 PrimaryStorage: {{ primary_storage }}
 BackupStorage: {{ backup_storage }}
 ReplicaStorage: {{ replica_storage }}
@@ -43,6 +45,13 @@ Storage:
     SupplementalGroups: {{ storage3_supplemental_groups }}
     Fsgroup: {{ storage3_fs_group }}
 DefaultContainerResource:
+DefaultContainerResources: 
+DefaultLoadResources:  
+DefaultLspvcResources:  
+DefaultRmdataResources:  
+DefaultBackupResources:  
+DefaultPgbouncerResources:  
+DefaultPgpoolResources:
 ContainerResources:
   small:
     RequestsMemory:  512Mi
@@ -57,7 +66,7 @@ ContainerResources:
 Pgo:
   AutofailSleepSeconds:  {{ auto_failover_sleep_secs }} 
   Audit:  false
-  LSPVCTemplate:  /config/pgo.lspvc-template.json
-  LoadTemplate:  /config/pgo.load-template.json
+  LSPVCTemplate:  /pgo-config/pgo.lspvc-template.json
+  LoadTemplate:  /pgo-config/pgo.load-template.json
   COImagePrefix:  {{ co_image_prefix }}
   COImageTag:  {{ co_image_tag }}
