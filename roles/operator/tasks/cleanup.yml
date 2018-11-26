@@ -34,14 +34,14 @@
 - name: Delete existing Service Account
   shell: |
     {{ kubectl_or_oc }} delete serviceaccount \
-      postgres-operator scheduler-sa -n {{ kubernetes_namespace }}
+      postgres-operator scheduler-sa pgo-backrest -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
 - name: Delete existing Cluster Role Bindings
   shell: |
     {{ kubectl_or_oc }} delete clusterrolebinding \
-      pgopclusterbinding pgopclusterbindingcrd scheduler-sa -n {{ kubernetes_namespace }}
+      pgopclusterbinding pgopclusterbindingcrd scheduler-sa pgo-backrest-role-binding -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
@@ -55,14 +55,14 @@
 - name: Delete existing Role Binding
   shell: |
     {{ kubectl_or_oc }} delete rolebinding \
-      pgo-role-binding -n {{ kubernetes_namespace }}
+      pgo-role-binding pgo-backrest-role-binding -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
 - name: Delete existing Role
   shell: |
     {{ kubectl_or_oc }} delete role \
-      pgo-role -n {{ kubernetes_namespace }}
+      pgo-role pgo-backrest-role -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
 
