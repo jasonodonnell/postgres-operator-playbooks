@@ -92,6 +92,33 @@
                                 "readOnly": true
                             }
                         ]
+                    },
+                    {
+                        "name": "scheduler",
+                        "image": "{{ co_image_prefix }}/pgo-scheduler:{{ co_image_tag }}",
+                        "env": [
+                            {
+                                "name": "NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "TIMEOUT",
+                                "value": "{{ scheduler_timeout }}"
+                            }
+                        ],
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/pgo-config",
+                                "name": "pgo-config",
+                                "readOnly": true
+                            }
+                        ],
+                        "resources": {},
+                        "imagePullPolicy": "IfNotPresent"
                     }
                 ],
                 "volumes": [

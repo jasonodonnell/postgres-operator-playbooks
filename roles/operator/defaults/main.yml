@@ -1,4 +1,6 @@
 ---
+backrest_port: "2022"
+cleanup: "false"
 crunchy_debug: "false"
 
 kubernetes_deployment_name: "pgo"

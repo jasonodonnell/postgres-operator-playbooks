@@ -2,6 +2,7 @@
 - name: Use kubectl or oc
   set_fact:
     kubectl_or_oc: "{{ openshift_oc_bin if openshift_oc_bin is defined else 'kubectl' }}"
+  tags: deprovision
 
 - name: Delete existing Deployments
   shell: |
@@ -9,20 +10,23 @@
       postgres-operator crunchy-scheduler -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing ConfigMaps
   shell: |
     {{ kubectl_or_oc }} delete configmap \
-      pgo-config pgo-pgbackrest-config -n {{ kubernetes_namespace }}
+      pgo-config pgo-backrest-repo-config -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Secrets
   shell: |
     {{ kubectl_or_oc }} delete secret \
-      pgo-auth-secret -n {{ kubernetes_namespace }}
+      pgo-auth-secret pgo-backrest-repo-config -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Services
   shell: |
@@ -30,6 +34,7 @@
       postgres-operator -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Service Account
   shell: |
@@ -37,6 +42,7 @@
       postgres-operator scheduler-sa pgo-backrest -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Cluster Role Bindings
   shell: |
@@ -44,6 +50,7 @@
       pgopclusterbinding pgopclusterbindingcrd scheduler-sa pgo-backrest-role-binding -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Cluster Roles
   shell: |
@@ -51,6 +58,7 @@
       pgopclusterrole pgopclusterrolecrd scheduler-sa -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Role Binding
   shell: |
@@ -58,6 +66,7 @@
       pgo-role-binding pgo-backrest-role-binding -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Role
   shell: |
@@ -65,6 +74,7 @@
       pgo-role pgo-backrest-role -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Custom Objects
   shell: |
@@ -73,6 +83,7 @@
       -n {{ kubernetes_namespace }} --all
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing CRDs
   shell: |
@@ -84,6 +95,7 @@
      -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Remove Data Jobs
   shell: |
@@ -91,6 +103,7 @@
       --selector=pgrmdata=true -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision
 
 - name: Delete existing Backup Jobs
   shell: |
@@ -98,3 +111,4 @@
       --selector=pgbackup=true -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
+  tags: deprovision

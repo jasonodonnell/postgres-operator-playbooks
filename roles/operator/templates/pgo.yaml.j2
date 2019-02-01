@@ -4,7 +4,9 @@ Cluster:
   CCPImagePrefix:  {{ ccp_image_prefix }}
   CCPImageTag:  {{ ccp_image_tag }}
   Autofail:  {{ auto_failover }}
+  AutofailReplaceReplica:  {{ auto_failover_replace_replica }}
   Backrest:  {{ backrest }}
+  BackrestPort:  {{ backrest_port }}
   Metrics:  {{ metrics }}
   Badger:  {{ badger }}
   Port:  {{ db_port }}
@@ -20,8 +22,10 @@ Cluster:
   LogStatement: {{ log_statement }}
   LogMinDurationStatement:  {{ log_min_duration_statement }}
 PrimaryStorage: {{ primary_storage }}
+XlogStorage: {{ xlog_storage }}
 BackupStorage: {{ backup_storage }}
 ReplicaStorage: {{ replica_storage }}
+BackrestStorage: {{ backrest_storage }}
 Storage:
   storage1:
     AccessMode:  {{ storage1_access_mode }}
