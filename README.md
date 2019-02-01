@@ -31,6 +31,7 @@ ansible-playbook -i inventory install.yml
 After installation completes, set the following environment variables for `pgo` to work correctly:
 
 ```
+export PGOUSER=~/.pgouser
 export PGO_CA_CERT=/tmp/pgo-config/pg-operator.crt
 export PGO_CLIENT_CERT=/tmp/pgo-config/pg-operator.crt
 export PGO_CLIENT_KEY=/tmp/pgo-config/privkey.pem
