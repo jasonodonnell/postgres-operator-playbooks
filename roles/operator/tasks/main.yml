@@ -120,5 +120,5 @@
 
     - name: Deploy PGO
       shell: |
-        {{ openshift_oc_bin }} create --filename={{ kubernetes_base_path }}/deployment.json \
+        {{ kubectl_or_oc }} create --filename={{ kubernetes_base_path }}/deployment.json \
           -n {{ kubernetes_namespace }}

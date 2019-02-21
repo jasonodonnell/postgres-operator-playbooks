@@ -80,9 +80,15 @@ storage3_class='fast'
 #storage3_fs_group=26
 
 # Deploy into Openshift
+# Note: openshift_token can be used for token authentication
 # =====================
-openshift_host=''
-openshift_skip_tls_verify=true
-openshift_project='demo'
-openshift_user=''
-openshift_password=''
+# openshift_host=''
+# openshift_skip_tls_verify=true
+# openshift_project=''
+# openshift_user=''
+# openshift_password=''
+
+# Deploy into Kubernetes
+# =====================
+# kubernetes_context=''
+# kubernetes_namespace=''
