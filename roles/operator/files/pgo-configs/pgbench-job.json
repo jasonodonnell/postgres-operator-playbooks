@@ -4,7 +4,6 @@
     "metadata": {
         "name": "{{.JobName}}",
         "labels": {
-            "name": "{{.JobName}}",
             "vendor": "crunchydata",
             "pgo-benchmark": "true",
             "pg-cluster": "{{.ClusterName}}"
