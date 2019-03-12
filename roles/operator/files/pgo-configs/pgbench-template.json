@@ -4,9 +4,11 @@
     "metadata": {
         "name": "{{.JobName}}",
         "labels": {
+            "name": "{{.JobName}}",
             "vendor": "crunchydata",
             "pgo-benchmark": "true",
-            "pg-cluster": "{{.ClusterName}}"
+            "pg-cluster": "{{.ClusterName}}",
+            "created": "{{.Created}}"
         }
     },
     "spec": {
@@ -17,7 +19,8 @@
                 "labels": {
                     "vendor": "crunchydata",
                     "pgo-benchmark": "true",
-                    "pg-cluster": "{{.ClusterName}}"
+                    "pg-cluster": "{{.ClusterName}}",
+                    "created": "{{.Created}}"
                 }
             },
             "spec": {
