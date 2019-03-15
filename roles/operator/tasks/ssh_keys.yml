@@ -3,28 +3,34 @@
   file:
     path: '{{ kubernetes_base_path }}'
     state: directory
+  tags: [install]
 
 - name: Generate SSH RSA Host Key
   command : ssh-keygen -q -t rsa -f "{{ kubernetes_base_path }}/ssh_host_rsa_key" -C "" -N ""
   args:
     creates: "{{ kubernetes_base_path }}/ssh_host_rsa_key"
+  tags: [install]
 
 - name: Generate SSH ECDSA Host Key
   command : ssh-keygen -q -t ecdsa -f "{{ kubernetes_base_path }}/ssh_host_ecdsa_key" -C "" -N ""
   args:
     creates: "{{ kubernetes_base_path }}/ssh_host_ecdsa_key"
+  tags: [install]
 
 - name: Generate SSH ED25519 Host Key
   command : ssh-keygen -q -t ed25519 -f "{{ kubernetes_base_path }}/ssh_host_ed25519_key" -C "" -N ""
   args:
     creates: "{{ kubernetes_base_path }}/ssh_host_ed25519_key"
+  tags: [install]
 
 - name: Generate SSH Client Key
   command : ssh-keygen -q -f "{{ kubernetes_base_path }}/id_rsa" -C "" -N ""
   args:
     creates: "{{ kubernetes_base_path }}/id_rsa"
+  tags: [install]
 
 - name: Create authorized_keys
   command : cp {{ kubernetes_base_path }}/id_rsa.pub {{ kubernetes_base_path }}/authorized_keys
   args:
     creates: "{{ kubernetes_base_path }}/authorized_keys"
+  tags: [install]

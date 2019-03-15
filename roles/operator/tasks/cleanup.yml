@@ -2,7 +2,9 @@
 - name: Use kubectl or oc
   set_fact:
     kubectl_or_oc: "{{ openshift_oc_bin if openshift_oc_bin is defined else 'kubectl' }}"
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Deployments
   shell: |
@@ -10,7 +12,9 @@
       postgres-operator crunchy-scheduler -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing ConfigMaps
   shell: |
@@ -18,7 +22,9 @@
       pgo-config pgo-backrest-repo-config -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Secrets
   shell: |
@@ -34,7 +40,9 @@
       postgres-operator -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Service Account
   shell: |
@@ -42,7 +50,9 @@
       postgres-operator scheduler-sa pgo-backrest -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Cluster Role Bindings
   shell: |
@@ -50,7 +60,9 @@
       pgopclusterbinding pgopclusterbindingcrd scheduler-sa pgo-backrest-role-binding -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Cluster Roles
   shell: |
@@ -58,7 +70,9 @@
       pgopclusterrole pgopclusterrolecrd scheduler-sa -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Role Binding
   shell: |
@@ -66,7 +80,9 @@
       pgo-role-binding pgo-backrest-role-binding -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Role
   shell: |
@@ -74,7 +90,9 @@
       pgo-role pgo-backrest-role -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - upgrade
 
 - name: Delete existing Custom Objects
   shell: |
