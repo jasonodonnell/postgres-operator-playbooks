@@ -1,11 +1,11 @@
 ---
 - include_vars: openshift.yml
-  tags: deprovision
+  tags: always
 
 - name: Set kubernetes_namespace
   set_fact:
     kubernetes_namespace: "{{ openshift_project }}"
-  tags: deprovision
+  tags: always
 
 - name: Ensure workspace directories exist
   file:
@@ -14,7 +14,7 @@
   with_items:
     - "{{ kubernetes_base_path }}"
     - "{{ openshift_oc_config_file | dirname }}"
-  tags: deprovision
+  tags: always
 
 - name: Authenticate with OpenShift via user and password
   shell: |
@@ -27,7 +27,7 @@
     - openshift_password is defined and openshift_password != ''
     - openshift_token is not defined
   no_log: true
-  tags: deprovision
+  tags: always
 
 - name: Authenticate with OpenShift via token
   shell: |
@@ -36,4 +36,4 @@
       --insecure-skip-tls-verify={{ openshift_skip_tls_verify | default(false) | bool }}
   when: openshift_token is defined and openshift_token != ''
   no_log: true
-  tags: deprovision
+  tags: always

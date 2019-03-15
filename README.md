@@ -24,13 +24,13 @@ Next, edit the `inventory` file included to configure the Crunchy PostgreSQL Ope
 
 Once the `inventory` file has been configured, run the following command to deploy:
 
-```
-ansible-playbook -i inventory install.yml
+```bash
+ansible-playbook -i inventory main.yml --tags="install"
 ```
 
 After installation completes, set the following environment variables for `pgo` to work correctly:
 
-```
+```bash
 export PGOUSER=~/.pgouser
 export PGO_CA_CERT=/tmp/pgo-config/pg-operator.crt
 export PGO_CLIENT_CERT=/tmp/pgo-config/pg-operator.crt
@@ -41,8 +41,20 @@ export CO_APISERVER_URL=https://${URL?}:8443
 
 Finally, test `pgo` is communicating with the PostgreSQL Operator API Service:
 
-```
+```bash
 pgo version
+```
+
+## Upgrading
+
+To upgrade PostgreSQL Operator, first update the `inventory` file with the new target 
+version of PostgreSQL Operator and Crunchy Container container images to use.
+
+Next, run the following command with the `upgrade` tag:
+
+```bash
+# NOTE: This is delete all operator related objects
+ansible-playbook -i inventory main.yml --tags="upgrade"
 ```
 
 ## Deprovisioning
@@ -51,7 +63,7 @@ To completely remove PostgreSQL Operator, run the following command:
 
 ```bash
 # NOTE: This is delete all operator related objects
-ansible-playbook -i inventory install.yml --tags="deprovision"
+ansible-playbook -i inventory main.yml --tags="deprovision"
 ```
 
 ## More Information

@@ -2,7 +2,7 @@
 - fail:
     msg: "Only set one of kubernetes_context or openshift_host"
   when: openshift_host is defined and kubernetes_context is defined
-  tags: deprovision
+  tags: always
 
 - include_tasks: "{{ tasks }}"
   with_items:
@@ -11,7 +11,7 @@
   loop_control:
     loop_var: tasks
   when: openshift_host is defined
-  tags: deprovision
+  tags: always
 
 - include_tasks: "{{ tasks }}"
   with_items:
@@ -20,23 +20,34 @@
   loop_control:
     loop_var: tasks
   when: kubernetes_context is defined
-  tags: deprovision
+  tags: always
 
 - include_tasks: certs.yml
+  tags: [install]
+
 - include_tasks: ssh_keys.yml
+  tags: [install]
+
 - include_tasks: cleanup.yml
-  tags: deprovision
+  tags: [deprovision, upgrade]
+
+- include_tasks: deprecated.yml
+  tags: always
 
 - name: Use kubectl or oc
   set_fact:
     kubectl_or_oc: "{{ openshift_oc_bin if openshift_oc_bin is defined else 'kubectl' }}"
+  tags: always
 
 - name: Deploy PostgreSQL Operator (OpenShift)
+  tags: [install, upgrade]
   block:
     - name: Create PGO CRDs
       shell: |
         {{ kubectl_or_oc }} create -f \
           {{ role_path }}/files/crd.yaml -n {{ kubernetes_namespace }}
+      ignore_errors: yes
+      no_log: true
 
     - name: Template Cluster RBAC
       template:
@@ -89,6 +100,8 @@
           --from-file=sshd_config='{{ role_path }}/files/pgo-backrest-repo/sshd_config' \
           --from-file=config='{{ role_path }}/files/pgo-backrest-repo/config' \
           -n {{ kubernetes_namespace }}
+      ignore_errors: yes
+      no_log: true
 
     - name: Create PGO API Secret
       shell: |
@@ -98,6 +111,8 @@
           --from-file=pgouser='{{ kubernetes_base_path }}/pgouser' \
           --from-file=pgorole='{{ role_path }}/files/pgorole' \
           -n {{ kubernetes_namespace }}
+      ignore_errors: yes
+      no_log: true
 
     - name: Create PGO ConfigMap
       shell: |
