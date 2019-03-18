@@ -7,7 +7,7 @@
   tags: always
 
 - name: Check if the kubectl command is installed
-  shell: type kubectl
+  shell: which kubectl
   register: kubectl_result
   ignore_errors: yes
   tags: always

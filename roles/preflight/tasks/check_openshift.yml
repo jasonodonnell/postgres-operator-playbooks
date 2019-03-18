@@ -34,7 +34,7 @@
   tags: always
 
 - name: Check if the oc command is installed
-  shell: type oc
+  shell: which oc
   register: oc_result
   ignore_errors: yes
   tags: always

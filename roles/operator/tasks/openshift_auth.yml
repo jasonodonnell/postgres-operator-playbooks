@@ -12,7 +12,6 @@
     path: "{{ item  }}"
     state: directory
   with_items:
-    - "{{ kubernetes_base_path }}"
     - "{{ openshift_oc_config_file | dirname }}"
   tags: always
 

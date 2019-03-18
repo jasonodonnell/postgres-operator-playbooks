@@ -1,7 +1,7 @@
 ---
 - name: Deploy Crunchy PostgreSQL Operator 
   hosts: all
-  gather_facts: false
+  gather_facts: true
   roles:
     - preflight 
     - operator

@@ -4,7 +4,6 @@ cleanup: "false"
 crunchy_debug: "false"
 
 kubernetes_deployment_name: "pgo"
-kubernetes_base_path: "{{ local_base_config_path|default('/tmp') }}/{{ kubernetes_deployment_name }}-config"
 
 storage1_supplemental_groups: ''
 storage1_fs_group: ''
