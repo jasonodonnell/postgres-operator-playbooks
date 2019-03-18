@@ -2,6 +2,8 @@ localhost ansible_connection=local ansible_python_interpreter="/usr/bin/env pyth
 
 [all:vars]
 
+crunchy_debug='false'
+
 # PGO Admin Credentials
 pgo_username='admin'
 pgo_password=''
