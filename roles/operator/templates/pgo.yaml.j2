@@ -18,7 +18,7 @@ Cluster:
   Replicas:  {{ db_replicas }}
   ArchiveMode:  {{ archive_mode }}
   ArchiveTimeout:  {{ archive_timeout }}
-  ServiceType:  ClusterIP
+  ServiceType:  {{ service_type }}
   LogStatement: {{ log_statement }}
   LogMinDurationStatement:  {{ log_min_duration_statement }}
 PrimaryStorage: {{ primary_storage }}
