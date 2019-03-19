@@ -105,14 +105,14 @@
 
 - name: Delete existing CRDs
   shell: |
-    {{ kubectl_or_oc }} delete crd \
+    {{ kubectl_or_oc }} delete customresourcedefinition \
       pgbackups.cr.client-go.k8s.io pgreplicas.cr.client-go.k8s.io \
       pgclusters.cr.client-go.k8s.io pgpolicies.cr.client-go.k8s.io \
       pgtasks.cr.client-go.k8s.io pgtasks.cr.client-go.k8s.io \
       pgupgrades.cr.client-go.k8s.io pgingests.cr.client-go.k8s.io \
      -n {{ kubernetes_namespace }}
   ignore_errors: yes
-  no_log: true
+  no_log: false
   tags: deprovision
 
 - name: Delete existing Remove Data Jobs
