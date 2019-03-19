@@ -131,3 +131,12 @@ can configure the `primary_storage=storage1` variable in the inventory file.
 {{% notice tip %}}
 To utitlize mutli-zone deployments, see _Considerations for Multi-Zone Cloud Environments_ above.
 {{% /notice %}}
+
+## Installing Ansible on Linux or MacOS
+
+To install Ansible on Linux or MacOS, [see the official documentation](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-control-machine)
+ provided by Ansible.
+
+## Installing Ansible on Windows
+
+The following instructions will install [Cygwin](https://www.cygwin.com/) with Ansible.
