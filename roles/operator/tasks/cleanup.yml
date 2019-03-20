@@ -101,7 +101,9 @@
       -n {{ kubernetes_namespace }} --all
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - never
 
 - name: Delete existing CRDs
   shell: |
@@ -113,7 +115,9 @@
      -n {{ kubernetes_namespace }}
   ignore_errors: yes
   no_log: true
-  tags: deprovision
+  tags:
+  - deprovision
+  - never
 
 - name: Delete existing Remove Data Jobs
   shell: |
