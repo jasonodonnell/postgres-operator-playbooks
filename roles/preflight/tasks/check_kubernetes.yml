@@ -1,13 +1,6 @@
 ---
-- name: kubernetes_namespace should be defined
-  assert:
-    that:
-      - kubernetes_namespace is defined and kubernetes_namespace != ''
-    msg: "Set the value of 'kubernetes_namespace' in the inventory file."
-  tags: always
-
 - name: Check if the kubectl command is installed
-  shell: type kubectl
+  shell: which kubectl
   register: kubectl_result
   ignore_errors: yes
   tags: always

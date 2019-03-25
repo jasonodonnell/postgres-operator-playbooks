@@ -4,6 +4,31 @@
   when: openshift_host is defined and kubernetes_context is defined
   tags: always
 
+- name: Set output directory fact
+  set_fact:
+    output_dir: "./output"
+  tags: always
+
+- name: Ensure output directory exists
+  file: 
+    path: "{{ output_dir }}"
+    state: directory
+    mode: 0700
+  tags: always
+
+- name: Get all namespaces
+  set_fact:
+    all_namespaces: "{{ all_namespaces }} + [ '{{ item }}' ]"
+  with_items: 
+  - "{{ target_namespaces.split(',') }}"
+  - "{{ pgo_namespace }}"
+  tags: always
+
+- name: Set namespace unique list
+  set_fact:
+    all_namespaces: "{{ all_namespaces | list | unique }}"
+  tags: always
+
 - include_tasks: "{{ tasks }}"
   with_items:
     - openshift_auth.yml
@@ -22,17 +47,17 @@
   when: kubernetes_context is defined
   tags: always
 
-- include_tasks: certs.yml
-  tags: [install]
-
-- include_tasks: ssh_keys.yml
-  tags: [install]
-
 - include_tasks: cleanup.yml
   tags: [deprovision, upgrade]
 
 - include_tasks: deprecated.yml
   tags: always
+
+- include_tasks: certs.yml
+  tags: [install]
+
+- include_tasks: ssh_keys.yml
+  tags: [install]
 
 - name: Use kubectl or oc
   set_fact:
@@ -40,100 +65,138 @@
   tags: always
 
 - name: Deploy PostgreSQL Operator (OpenShift)
-  tags: [install, upgrade]
   block:
+    - name: Set output directory fact
+      set_fact:
+        output_dir: "./output"
+      tags: [install, upgrade]
+    
     - name: Create PGO CRDs
-      shell: |
-        {{ kubectl_or_oc }} create -f \
-          {{ role_path }}/files/crd.yaml -n {{ kubernetes_namespace }}
-      ignore_errors: yes
-      no_log: true
+      command: "{{ kubectl_or_oc }} create -f ./roles/operator/files/crd.yaml -n {{ pgo_namespace }}"
+      ignore_errors: no
+      no_log: false
+      tags: [install, upgrade]
 
     - name: Template Cluster RBAC
       template:
         src: cluster-rbac.yaml.j2
-        dest: "{{ kubernetes_base_path }}/cluster-rbac.yaml"
+        dest: "{{ output_dir }}/cluster-rbac.yaml"
         mode: '0600'
+      tags: [install, upgrade]
 
     - name: Create Cluster RBAC
-      shell: |
-        {{ kubectl_or_oc }} create -f \
-          {{ kubernetes_base_path }}/cluster-rbac.yaml -n {{ kubernetes_namespace }}
+      command: "{{ kubectl_or_oc }} create -f {{ output_dir }}/cluster-rbac.yaml -n {{ pgo_namespace }}"
+      tags: [install, upgrade]
     
     - name: Template PGO RBAC
       template:
         src: rbac.yaml.j2
-        dest: "{{ kubernetes_base_path }}/rbac.yaml"
+        dest: "{{ output_dir }}/rbac-{{ item }}.yaml"
         mode: '0600'
+      with_items: 
+      - "{{ all_namespaces }}"
+      tags: [install, upgrade]
 
     - name: Create PGO RBAC
-      shell: |
-        {{ kubectl_or_oc }} create -f \
-          {{ kubernetes_base_path }}/rbac.yaml -n {{ kubernetes_namespace }}
+      command: "{{ kubectl_or_oc }} create -f {{ output_dir }}/rbac-{{ item }}.yaml"
+      with_items: 
+      - "{{ all_namespaces }}"
+      tags: [install, upgrade]
 
     - name: Template PGO User
       template:
         src: pgouser.j2
-        dest: "{{ kubernetes_base_path }}/pgouser"
+        dest: "{{ output_dir }}/pgouser"
         mode: '0600'
+      tags: [install, upgrade]
 
     - name: Template Local PGO User
       template:
         src: pgouser.local.j2
-        dest: "~/.pgouser"
+        dest: "{{ pgo_keys_dir }}/pgouser"
         mode: '0400'
+      tags: [install, upgrade]
 
     - name: Template PGO Configuration
       template:
         src: pgo.yaml.j2
-        dest: "{{ kubernetes_base_path }}/pgo.yaml"
+        dest: "{{ output_dir }}/pgo.yaml"
         mode: '0600'
+      tags: [install, upgrade]
 
-    - name: Create PGO BackRest Repo ConfigMap
-      shell: |
+    - name: Create PGO BackRest Repo Secret
+      command: |
         {{ kubectl_or_oc }} create secret generic pgo-backrest-repo-config \
-          --from-file=authorized_keys='{{ kubernetes_base_path }}/authorized_keys' \
-          --from-file=id_rsa='{{ kubernetes_base_path }}/id_rsa' \
-          --from-file=ssh_host_rsa_key='{{ kubernetes_base_path }}/ssh_host_rsa_key' \
-          --from-file=ssh_host_ecdsa_key='{{ kubernetes_base_path }}/ssh_host_ecdsa_key' \
-          --from-file=ssh_host_ed25519_key='{{ kubernetes_base_path }}/ssh_host_ed25519_key' \
-          --from-file=sshd_config='{{ role_path }}/files/pgo-backrest-repo/sshd_config' \
-          --from-file=config='{{ role_path }}/files/pgo-backrest-repo/config' \
-          -n {{ kubernetes_namespace }}
-      ignore_errors: yes
-      no_log: true
+          --from-file=authorized_keys='{{ output_dir }}/authorized_keys' \
+          --from-file=config='./roles/operator/files/pgo-backrest-repo/config' \
+          --from-file=id_rsa='{{ output_dir }}/id_rsa' \
+          --from-file=ssh_host_ecdsa_key='{{ output_dir }}/ssh_host_ecdsa_key' \
+          --from-file=ssh_host_ed25519_key='{{ output_dir }}/ssh_host_ed25519_key' \
+          --from-file=ssh_host_rsa_key='{{ output_dir }}/ssh_host_rsa_key' \
+          --from-file=sshd_config='./roles/operator/files/pgo-backrest-repo/sshd_config' \
+          -n {{ item }}
+      with_items:
+      - "{{ all_namespaces }}"
+      tags: [install, upgrade]
 
     - name: Create PGO API Secret
-      shell: |
-        {{ kubectl_or_oc }} create secret generic pgo-auth-secret \
-          --from-file=server.crt='{{ kubernetes_base_path }}/pg-operator.crt' \
-          --from-file=server.key='{{ kubernetes_base_path }}/privkey.pem' \
-          --from-file=pgouser='{{ kubernetes_base_path }}/pgouser' \
-          --from-file=pgorole='{{ role_path }}/files/pgorole' \
-          -n {{ kubernetes_namespace }}
-      ignore_errors: yes
-      no_log: true
+      command: |
+        {{ kubectl_or_oc }} create secret tls pgo.tls \
+          --cert='{{ output_dir }}/server.crt' \
+          --key='{{ output_dir }}/server.pem' \
+          -n {{ pgo_namespace }}
+      tags: [install, upgrade]
 
     - name: Create PGO ConfigMap
-      shell: |
+      command: |
         {{ kubectl_or_oc }} create configmap pgo-config \
-          --from-file=pgo.yaml='{{ kubernetes_base_path }}/pgo.yaml' \
-          --from-file={{ role_path }}/files/pgo-configs \
-          --from-file={{ role_path }}/files/pgo-configs/cluster/1 \
-          -n {{ kubernetes_namespace }}
+          --from-file=pgo.yaml='{{ output_dir }}/pgo.yaml' \
+          --from-file=pgouser='{{ output_dir }}/pgouser' \
+          --from-file='./roles/operator/files/pgo-configs' \
+          -n {{ pgo_namespace }}
+      tags: [install, upgrade]
 
     - name: Create PGO Service
-      shell: |
-        {{ kubectl_or_oc }} create --filename='{{ role_path }}/files/service.json' \
-          -n {{ kubernetes_namespace }}
+      command: |
+        {{ kubectl_or_oc }} create --filename='./roles/operator/files/service.json' -n {{ pgo_namespace }}
+      tags: [install, upgrade]
 
     - name: Template PGO Deployment
       template:
         src: deployment.json.j2
-        dest: "{{ kubernetes_base_path }}/deployment.json"
+        dest: "{{ output_dir }}/deployment.json"
         mode: '0600'
+      tags: [install, upgrade]
 
     - name: Deploy PGO
-      shell: |
-        {{ kubectl_or_oc }} create --filename={{ kubernetes_base_path }}/deployment.json \
-          -n {{ kubernetes_namespace }}
+      command: |
+        {{ kubectl_or_oc }} create --filename='{{ output_dir }}/deployment.json' -n {{ pgo_namespace }}
+      tags: [install, upgrade]
+
+    - name: Download PGO Linux Client
+      become: yes
+      become_method: sudo
+      get_url:
+        url: "{{ pgo_client_url }}/pgo"
+        dest: "/usr/local/bin/pgo"
+        mode: 0755
+      when: uname_result.stdout == "Linux"
+      tags: [install, upgrade]
+
+    - name: Download PGO MacOS Client
+      become: yes
+      become_method: sudo
+      get_url:
+        url: "{{ pgo_client_url }}/pgo-mac"
+        dest: "/usr/local/bin/pgo"
+        mode: 0755
+      when: uname_result.stdout == "Darwin"
+      tags: [install, upgrade]
+    
+    - name: Download PGO Windows Client
+      get_url:
+        url: "{{ pgo_client_url }}/pgo.exe"
+        dest: "/usr/local/bin/pgo"
+        mode: 0755
+      when: '"CYGWIN" in uname_result.stdout'
+      tags: [install, upgrade]

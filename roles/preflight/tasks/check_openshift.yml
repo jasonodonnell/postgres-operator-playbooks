@@ -1,12 +1,5 @@
 # check_openshift.yml
 ---
-- name: openshift_project should be defined
-  assert:
-    that:
-    - openshift_project is defined and openshift_project != ''
-    msg: "Set the value of 'openshift_project' in the inventory file."
-  tags: always
-
 - name: openshift_user should be defined
   assert:
     that:
@@ -34,7 +27,7 @@
   tags: always
 
 - name: Check if the oc command is installed
-  shell: type oc
+  shell: which oc
   register: oc_result
   ignore_errors: yes
   tags: always

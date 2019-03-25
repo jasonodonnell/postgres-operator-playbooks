@@ -2,20 +2,6 @@
 - include_vars: openshift.yml
   tags: always
 
-- name: Set kubernetes_namespace
-  set_fact:
-    kubernetes_namespace: "{{ openshift_project }}"
-  tags: always
-
-- name: Ensure workspace directories exist
-  file:
-    path: "{{ item  }}"
-    state: directory
-  with_items:
-    - "{{ kubernetes_base_path }}"
-    - "{{ openshift_oc_config_file | dirname }}"
-  tags: always
-
 - name: Authenticate with OpenShift via user and password
   shell: |
     {{ openshift_oc_bin }} login {{ openshift_host }} \
@@ -26,7 +12,7 @@
     - openshift_user is defined and openshift_user != ''
     - openshift_password is defined and openshift_password != ''
     - openshift_token is not defined
-  no_log: true
+  no_log: false
   tags: always
 
 - name: Authenticate with OpenShift via token

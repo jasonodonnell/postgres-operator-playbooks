@@ -1,34 +1,47 @@
 ---
 - name: Ensure directory exists for local self-signed TLS certs.
   file:
-    path: '{{ kubernetes_base_path }}'
+    path: '{{ output_dir }}'
     state: directory
   tags: [install]
 
 - name: Generate RSA Key
-  command: openssl genrsa \
-    -out "{{ kubernetes_base_path }}/privkey.pem" 2048
+  command: openssl genrsa -out "{{ output_dir }}/server.pem" 2048
   args:
-    creates: "{{ kubernetes_base_path }}/privkey.pem"
+    creates: "{{ output_dir }}/server.pem"
   tags: [install]
 
 - name: Generate CSR
   command: openssl req \
     -new \
     -subj '/C=US/ST=SC/L=Charleston/O=CrunchyData/CN=pg-operator' \
-    -key "{{ kubernetes_base_path }}/privkey.pem" \
-    -out "{{ kubernetes_base_path }}/pg-operator.csr"
+    -key "{{ output_dir }}/server.pem" \
+    -out "{{ output_dir }}/server.csr"
   args:
-    creates: "{{ kubernetes_base_path }}/pg-operator.csr"
+    creates: "{{ output_dir }}/server.csr"
   tags: [install]
 
 - name: Generate Self-signed Certificate
   command: openssl req \
     -x509 \
     -days 1825 \
-    -key "{{ kubernetes_base_path }}/privkey.pem" \
-    -in "{{ kubernetes_base_path }}/pg-operator.csr" \
-    -out "{{ kubernetes_base_path }}/pg-operator.crt"
+    -key "{{ output_dir }}/server.pem" \
+    -in "{{ output_dir }}/server.csr" \
+    -out "{{ output_dir }}/server.crt"
   args:
-    creates: "{{ kubernetes_base_path }}/pg-operator.crt"
+    creates: "{{ output_dir }}/server.crt"
+  tags: [install]
+
+- name: Ensure {{ pgo_keys_dir }} Directory Exists
+  file:
+    path: '{{ pgo_keys_dir }}'
+    state: directory
+  tags: [install]
+
+- name: Copy certificates to {{ pgo_keys_dir }}
+  command: "cp {{ output_dir }}/server.crt {{ pgo_keys_dir }}/client.crt"
+  tags: [install]
+
+- name: Copy keys to {{ pgo_keys_dir }}
+  command: "cp {{ output_dir }}/server.pem {{ pgo_keys_dir }}/client.pem"
   tags: [install]
