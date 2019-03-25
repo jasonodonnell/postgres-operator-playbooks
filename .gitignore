@@ -1,3 +1,6 @@
 roles/operator/files/pgo-configs/server.crt
 roles/operator/files/pgo-configs/server.key
-install.retry
+roles/operator/files/pgo-configs/server.pem
+main.retry
+output
+public

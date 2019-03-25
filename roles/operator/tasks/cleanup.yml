@@ -8,129 +8,193 @@
 
 - name: Delete existing Deployments
   shell: |
-    {{ kubectl_or_oc }} delete deployment \
-      postgres-operator crunchy-scheduler -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete deployment postgres-operator -n {{ pgo_namespace }}
   ignore_errors: yes
-  no_log: true
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing ConfigMaps
   shell: |
-    {{ kubectl_or_oc }} delete configmap \
-      pgo-config pgo-backrest-repo-config -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete configmap pgo-config -n {{ pgo_namespace }}
   ignore_errors: yes
-  no_log: true
+  no_log: false
+  tags:
+  - deprovision
+  - upgrade
+
+- name: Delete existing secrets
+  shell: |
+    {{ kubectl_or_oc }} delete secret pgo-backrest-repo-config -n {{ item }}
+  with_items:
+  - "{{ pgo_namespace }}"
+  - "{{ target_namespaces.split(',') }}"
+  ignore_errors: yes
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing Secrets
   shell: |
-    {{ kubectl_or_oc }} delete secret \
-      pgo-auth-secret pgo-backrest-repo-config -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete secret {{ item }} -n {{ pgo_namespace }}
+  with_items:
+  - "pgo.tls"
   ignore_errors: yes
-  no_log: true
+  no_log: false
   tags: deprovision
 
 - name: Delete existing Services
   shell: |
-    {{ kubectl_or_oc }} delete service \
-      postgres-operator -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete service postgres-operator -n {{ pgo_namespace }}
   ignore_errors: yes
-  no_log: true
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing Service Account
   shell: |
-    {{ kubectl_or_oc }} delete serviceaccount \
-      postgres-operator scheduler-sa pgo-backrest -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete serviceaccount postgres-operator -n {{ pgo_namespace }}
   ignore_errors: yes
-  no_log: true
+  no_log: false
+  tags:
+  - deprovision
+  - upgrade
+
+- name: Delete existing Service Account
+  shell: |
+    {{ kubectl_or_oc }} delete serviceaccount pgo-backrest -n {{ item }}
+  with_items:
+  - "{{ all_namespaces }}"
+  ignore_errors: yes
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing Cluster Role Bindings
   shell: |
-    {{ kubectl_or_oc }} delete clusterrolebinding \
-      pgopclusterbinding pgopclusterbindingcrd scheduler-sa pgo-backrest-role-binding -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete clusterrolebinding {{ item }} -n {{ pgo_namespace }}
+  with_items:
+  - "pgopclusterbinding"
+  - "pgopclusterbindingcrd"
   ignore_errors: yes
-  no_log: true
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing Cluster Roles
   shell: |
-    {{ kubectl_or_oc }} delete clusterrole \
-      pgopclusterrole pgopclusterrolecrd scheduler-sa -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete clusterrole {{ item }} -n {{ pgo_namespace }}
+  with_items:
+  - "pgopclusterrole"
+  - "pgopclusterrolecrd"
   ignore_errors: yes
-  no_log: true
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing Role Binding
   shell: |
-    {{ kubectl_or_oc }} delete rolebinding \
-      pgo-role-binding pgo-backrest-role-binding -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete rolebinding pgo-backrest-role-binding -n {{ item }}
+  with_items:
+  - "{{ all_namespaces }}"
   ignore_errors: yes
-  no_log: true
+  no_log: false
+  tags:
+  - deprovision
+  - upgrade
+
+- name: Delete existing Role Binding
+  shell: |
+    {{ kubectl_or_oc }} delete rolebinding pgo-role-binding -n {{ item }}
+  with_items:
+  - "{{ all_namespaces }}"
+  ignore_errors: yes
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing Role
   shell: |
-    {{ kubectl_or_oc }} delete role \
-      pgo-role pgo-backrest-role -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete role pgo-backrest-role -n {{ item }}
+  with_items:
+  - "{{ all_namespaces }}"
   ignore_errors: yes
-  no_log: true
+  no_log: false
+  tags:
+  - deprovision
+  - upgrade
+
+- name: Delete existing Role
+  shell: |
+    {{ kubectl_or_oc }} delete role pgo-role -n {{ item }}
+  with_items:
+  - "{{ all_namespaces }}"
+  ignore_errors: yes
+  no_log: false
   tags:
   - deprovision
   - upgrade
 
 - name: Delete existing Custom Objects
   shell: |
-    {{ kubectl_or_oc }} delete \
-      pgreplicas,pgbackups,pgclusters,pgpolicies,pgupgrades,pgtasks,pgingests \
-      -n {{ kubernetes_namespace }} --all
+    {{ kubectl_or_oc }} delete {{ item }} -n {{ pgo_namespace }} --all 
+  with_items:
+  - "pgbackups"
+  - "pgclusters"
+  - "pgpolicies"
+  - "pgreplicas"
+  - "pgtasks"
+  - "pgupgrades"
   ignore_errors: yes
-  no_log: true
-  tags:
-  - deprovision
-  - never
+  no_log: false
+  tags: deprovision
 
 - name: Delete existing CRDs
   shell: |
-    {{ kubectl_or_oc }} delete crd \
-      pgbackups.cr.client-go.k8s.io pgreplicas.cr.client-go.k8s.io \
-      pgclusters.cr.client-go.k8s.io pgpolicies.cr.client-go.k8s.io \
-      pgtasks.cr.client-go.k8s.io pgtasks.cr.client-go.k8s.io \
-      pgupgrades.cr.client-go.k8s.io pgingests.cr.client-go.k8s.io \
-     -n {{ kubernetes_namespace }}
+    {{ kubectl_or_oc }} delete customresourcedefinition {{ item }} -n {{ pgo_namespace }}
+  with_items:
+  - "pgbackups.crunchydata.com"
+  - "pgclusters.crunchydata.com"
+  - "pgpolicies.crunchydata.com"
+  - "pgreplicas.crunchydata.com"
+  - "pgtasks.crunchydata.com"
+  - "pgupgrades.crunchydata.com"
   ignore_errors: yes
-  no_log: true
-  tags:
-  - deprovision
-  - never
-
-- name: Delete existing Remove Data Jobs
-  shell: |
-    {{ kubectl_or_oc }} delete jobs \
-      --selector=pgrmdata=true -n {{ kubernetes_namespace }}
-  ignore_errors: yes
-  no_log: true
+  no_log: false
   tags: deprovision
 
-- name: Delete existing Backup Jobs
-  shell: |
-    {{ kubectl_or_oc }} delete jobs \
-      --selector=pgbackup=true -n {{ kubernetes_namespace }}
+- name: Check for output directory
+  stat:
+    path: "{{ output_dir }}"
+  register: out_dir
   ignore_errors: yes
-  no_log: true
+  no_log: false
   tags: deprovision
+
+- name: Delete local output directory
+  file:
+    state: absent
+    path: "{{ output_dir }}/"
+  when: out_dir.stat.exists
+  ignore_errors: yes
+  no_log: false
+  tags: deprovision
+
+- name: Set output directory fact
+  set_fact:
+    output_dir: "./output"
+  tags: always
+
+- name: Ensure output directory exists
+  file:
+    path: "{{ output_dir }}"
+    state: directory
+    mode: 0700
+  tags: always

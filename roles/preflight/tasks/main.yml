@@ -1,5 +1,14 @@
-# main.yml
 ---
+- fail:
+    msg: "Please specify the a tag: deprovision, install or upgrade"
+  tags: always
+  when: ansible_run_tags[0] == "all"
+
+- name: Check Operating System
+  shell: uname
+  register: uname_result
+  tags: [install, upgrade]
+
 - include_tasks: check_openshift.yml
   when: openshift_host is defined and openshift_host != ''
   tags: always
@@ -13,12 +22,14 @@
   tags: always
   when: "{{item}} is undefined or {{item}} == ''"
   with_items:
+    - pgo_namespace
+    - target_namespaces
     - pgo_username
     - pgo_password
     - ccp_image_prefix
     - ccp_image_tag 
-    - co_image_prefix
-    - co_image_tag
+    - pgo_image_prefix
+    - pgo_image_tag
     - auto_failover
     - backrest 
     - badger

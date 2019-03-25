@@ -1,3 +1,10 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: postgres-operator
+  namespace: {{ pgo_namespace }}
+---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
@@ -10,6 +17,8 @@ rules:
       - '*'
     resources:
       - nodes
+      - namespaces
+      - storageclasses
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -25,7 +34,6 @@ rules:
       - pgpolicies
       - pgupgrades
       - pgtasks
-      - pgingests
       - pgbackups
       - pgreplicas
 ---
@@ -40,7 +48,7 @@ roleRef:
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User
-  name: system:serviceaccount:{{ namespace }}:postgres-operator
+  name: system:serviceaccount:{{ pgo_namespace }}:postgres-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -53,4 +61,4 @@ roleRef:
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User
-  name: system:serviceaccount:{{ namespace }}:postgres-operator
+  name: system:serviceaccount:{{ pgo_namespace }}:postgres-operator
