@@ -19,7 +19,7 @@ The following command should be run from the directory where the
 `postgres-operator-playbooks` project is located:
 
 ```bash
-ansible-playbook -i /path/to/inventory main.yml --tags=install --ask-become-password
+ansible-playbook -i /path/to/inventory main.yml --tags=install --ask-become-pass
 ```
 
 ## Installing on MacOS
@@ -31,7 +31,7 @@ The following command should be run from the directory where the
 `postgres-operator-playbooks` project is located:
 
 ```bash
-ansible-playbook -i /path/to/inventory main.yml --tags=install --ask-become-password
+ansible-playbook -i /path/to/inventory main.yml --tags=install --ask-become-pass
 ```
 
 ## Installing on Windows

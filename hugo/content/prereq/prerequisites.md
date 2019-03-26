@@ -51,6 +51,7 @@ The following are the variables available for configuration:
 | `openshift_skip_tls_verify`       |             | When deploying to Openshift, set to ignore the integrity of TLS certificates for the OpenShift cluster.                                                                          |
 | `openshift_token`                 |             | When deploying to OpenShift, set to configure the token used for login (when not using username/password authentication).                                                        |
 | `openshift_user`                  |             | When deploying to OpenShift, set to configure the username used for login.                                                                                                       |
+| `pgo_install_client`              | true        | Configures the playbooks to install the `pgo` client if set to true.                                                                                                             |
 | `pgo_image_prefix`                | crunchydata | Configures the image prefix used when creating containers for the Crunchy PostgreSQL Operator (apiserver, operator, scheduler..etc).                                             |
 | `pgo_image_tag`                   |             | Configures the image tag used when creating containers for the Crunchy PostgreSQL Operator (apiserver, operator, scheduler..etc)                                                 |
 | `pgo_namespace`                   |             | Set to configure the namespace where Operator will be deployed.                                                                                                                  |
@@ -159,3 +160,34 @@ our namespaces are named `pgo`, `pgouser1` and `pgouser2`), configure the follow
 pgo_namespace='pgo'
 target_namespaces='pgouser1,pgouser2'
 ```
+
+## Deploying Multiple Operators
+
+The 4.0 release of the Crunchy PostgreSQL Operator allows for multiple operator deployments in the same cluster.  
+To install the Crunchy PostgreSQL Operator to multiple namespaces, it's recommended to have an `inventory` file 
+for each deployment of the operator.
+
+For each operator deployment the following inventory variables should be configured uniquely for each install.
+
+For example, operator could be deployed twice by changing the `pgo_namespace` and `target_namespaces` for those 
+deployments:
+
+Inventory A would deploy operator to the `pgo` namespace and it would manage the `pgo` target namespace.
+
+```init
+# Inventory A
+pgo_namespace='pgo'
+target_namespaces='pgo'
+...
+```
+
+Inventory B would deploy operator to the `pgo2` namespace and it would manage the `pgo2` and `pgo3` target namespaces.
+```init
+# Inventory B
+pgo_namespace='pgo2'
+target_namespaces='pgo2,pgo3'
+...
+```
+
+Each install of the operator will create a corresponding directory in `$HOME/.pgo/<PGO NAMESPACE>` which will contain 
+the TLS and `pgouser` client credentials.

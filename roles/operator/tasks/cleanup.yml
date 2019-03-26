@@ -76,10 +76,10 @@
 
 - name: Delete existing Cluster Role Bindings
   shell: |
-    {{ kubectl_or_oc }} delete clusterrolebinding {{ item }} -n {{ pgo_namespace }}
+    {{ kubectl_or_oc }} delete clusterrolebinding {{ pgo_namespace }}{{ item }} -n {{ pgo_namespace }}
   with_items:
-  - "pgopclusterbinding"
-  - "pgopclusterbindingcrd"
+  - "clusterbinding"
+  - "clusterbindingcrd"
   ignore_errors: yes
   no_log: false
   tags:
@@ -88,10 +88,10 @@
 
 - name: Delete existing Cluster Roles
   shell: |
-    {{ kubectl_or_oc }} delete clusterrole {{ item }} -n {{ pgo_namespace }}
+    {{ kubectl_or_oc }} delete clusterrole {{ pgo_namespace }}{{ item }} -n {{ pgo_namespace }}
   with_items:
-  - "pgopclusterrole"
-  - "pgopclusterrolecrd"
+  - "clusterrole"
+  - "clusterrolecrd"
   ignore_errors: yes
   no_log: false
   tags:
@@ -144,28 +144,9 @@
 
 - name: Delete existing Custom Objects
   shell: |
-    {{ kubectl_or_oc }} delete {{ item }} -n {{ pgo_namespace }} --all 
+    {{ kubectl_or_oc }} delete pgbackups,pgclusters,pgpolicies,pgreplicas,pgtasks,pgupgrades -n {{ pgo_namespace }} --all
   with_items:
-  - "pgbackups"
-  - "pgclusters"
-  - "pgpolicies"
-  - "pgreplicas"
-  - "pgtasks"
-  - "pgupgrades"
-  ignore_errors: yes
-  no_log: false
-  tags: deprovision
-
-- name: Delete existing CRDs
-  shell: |
-    {{ kubectl_or_oc }} delete customresourcedefinition {{ item }} -n {{ pgo_namespace }}
-  with_items:
-  - "pgbackups.crunchydata.com"
-  - "pgclusters.crunchydata.com"
-  - "pgpolicies.crunchydata.com"
-  - "pgreplicas.crunchydata.com"
-  - "pgtasks.crunchydata.com"
-  - "pgupgrades.crunchydata.com"
+  - "{{ all_namespaces }}"
   ignore_errors: yes
   no_log: false
   tags: deprovision
@@ -186,11 +167,6 @@
   ignore_errors: yes
   no_log: false
   tags: deprovision
-
-- name: Set output directory fact
-  set_fact:
-    output_dir: "./output"
-  tags: always
 
 - name: Ensure output directory exists
   file:

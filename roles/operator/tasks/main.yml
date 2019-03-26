@@ -6,7 +6,7 @@
 
 - name: Set output directory fact
   set_fact:
-    output_dir: "./output"
+    output_dir: "./output/{{ pgo_namespace }}"
   tags: always
 
 - name: Ensure output directory exists
@@ -64,17 +64,9 @@
     kubectl_or_oc: "{{ openshift_oc_bin if openshift_oc_bin is defined else 'kubectl' }}"
   tags: always
 
-- name: Deploy PostgreSQL Operator (OpenShift)
+- name: Deploy PostgreSQL Operator
   block:
-    - name: Set output directory fact
-      set_fact:
-        output_dir: "./output"
-      tags: [install, upgrade]
-    
-    - name: Create PGO CRDs
-      command: "{{ kubectl_or_oc }} create -f ./roles/operator/files/crd.yaml -n {{ pgo_namespace }}"
-      ignore_errors: no
-      no_log: false
+    - include_tasks: crds.yml
       tags: [install, upgrade]
 
     - name: Template Cluster RBAC
@@ -180,7 +172,7 @@
         url: "{{ pgo_client_url }}/pgo"
         dest: "/usr/local/bin/pgo"
         mode: 0755
-      when: uname_result.stdout == "Linux"
+      when: uname_result.stdout == "Linux" and pgo_client_install == "true"
       tags: [install, upgrade]
 
     - name: Download PGO MacOS Client
@@ -190,7 +182,7 @@
         url: "{{ pgo_client_url }}/pgo-mac"
         dest: "/usr/local/bin/pgo"
         mode: 0755
-      when: uname_result.stdout == "Darwin"
+      when: uname_result.stdout == "Darwin" and pgo_client_install == "true"
       tags: [install, upgrade]
     
     - name: Download PGO Windows Client
@@ -198,5 +190,5 @@
         url: "{{ pgo_client_url }}/pgo.exe"
         dest: "/usr/local/bin/pgo"
         mode: 0755
-      when: '"CYGWIN" in uname_result.stdout'
+      when: '"CYGWIN" in uname_result.stdout and pgo_client_install == "true"'
       tags: [install, upgrade]

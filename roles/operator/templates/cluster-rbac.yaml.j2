@@ -8,7 +8,7 @@ metadata:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: pgopclusterrole
+  name: {{ pgo_namespace }}clusterrole
 rules:
   - verbs:
       - get
@@ -23,7 +23,7 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: pgopclusterrolecrd
+  name: {{ pgo_namespace }}clusterrolecrd
 rules:
   - verbs:
       - '*'
@@ -40,11 +40,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: pgopclusterbinding
+  name: {{ pgo_namespace }}clusterbinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: pgopclusterrole
+  name: {{ pgo_namespace }}clusterrole
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User
@@ -53,11 +53,11 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: pgopclusterbindingcrd
+  name: {{ pgo_namespace }}clusterbindingcrd
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: pgopclusterrolecrd
+  name: {{ pgo_namespace }}clusterrolecrd
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User

@@ -4,7 +4,7 @@ cleanup: "false"
 common_name: "crunchydata"
 crunchy_debug: "false"
 
-kubernetes_deployment_name: "pgo"
+pgo_client_install: "true"
 
 storage1_supplemental_groups: ''
 storage1_fs_group: ''
