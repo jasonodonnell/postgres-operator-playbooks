@@ -116,6 +116,13 @@
         mode: '0600'
       tags: [install, upgrade]
 
+    - name: Template BackRest AWS S3 Configuration
+      template:
+        src: aws-s3-credentials.yaml.j2
+        dest: "{{ output_dir }}/aws-s3-credentials.yaml"
+        mode: '0600'
+      tags: [install, upgrade]
+
     - name: Create PGO BackRest Repo Secret
       command: |
         {{ kubectl_or_oc }} create secret generic pgo-backrest-repo-config \
@@ -126,6 +133,8 @@
           --from-file=ssh_host_ed25519_key='{{ output_dir }}/ssh_host_ed25519_key' \
           --from-file=ssh_host_rsa_key='{{ output_dir }}/ssh_host_rsa_key' \
           --from-file=sshd_config='./roles/operator/files/pgo-backrest-repo/sshd_config' \
+          --from-file=aws-s3-credentials.yaml='{{ output_dir }}/aws-s3-credentials.yaml' \
+          --from-file=aws-s3-ca.crt='./roles/operator/files/pgo-backrest-repo/aws-s3-ca.crt' \
           -n {{ item }}
       with_items:
       - "{{ all_namespaces }}"
