@@ -43,15 +43,22 @@ The following are the variables available for configuration:
 | `db_port`                         | 5432        | Set to configure the default port used on all newly created clusters.                                                                                                            |
 | `db_replicas`                     | 1           | Set to configure the amount of replicas provisioned on all newly created clusters.                                                                                               |
 | `db_user`                         | testuser    | Set to configure the username of the dedicated user account on all newly created clusters.                                                                                       |
+| `grafana_admin_username`          | admin       | Set to configure the login username for the Grafana administrator.														     |
+| `grafana_admin_password`          |             | Set to configure the login password for the Grafana administrator.														     |
+| `grafana_install`                 | true        | Set to true to install Crunchy Grafana to visualize metrics.                                                                                                                     |
+| `grafana_storage_access_mode`     |             | Set to the access mode used by the configured storage class for Grafana persistent volumes.                                                                                      |
+| `grafana_storage_class_name`      |             | Set to the name of the storage class used when creating Grafana persistent volumes.                                                                                              |
+| `grafana_volume_size`             |             | Set to the size of persistent volume to create for Grafana.                                                                                                                      |
 | `kubernetes_context`              |             | When deploying to Kubernetes, set to configure the context name of the kubeconfig to be used for authentication.                                                                 |
 | `log_statement`                   | none        | Set to `none`, `ddl`, `mod`, or `all` to configure the statements that will be logged in PostgreSQL's logs on all newly created clusters.                                        |
 | `metrics`                         | false       | Set to true enable performance metrics on all newly created clusters.                                                                                                            |
+| `metrics_namespace`               | metrics     | Configures the target namespace when deploying Grafana and/or Prometheus                                                                                                         |
 | `openshift_host`                  |             | When deploying to OpenShift, set to configure the hostname of the OpenShift cluster to connect to.                                                                               |
 | `openshift_password`              |             | When deploying to OpenShift, set to configure the password used for login.                                                                                                       |
 | `openshift_skip_tls_verify`       |             | When deploying to Openshift, set to ignore the integrity of TLS certificates for the OpenShift cluster.                                                                          |
 | `openshift_token`                 |             | When deploying to OpenShift, set to configure the token used for login (when not using username/password authentication).                                                        |
 | `openshift_user`                  |             | When deploying to OpenShift, set to configure the username used for login.                                                                                                       |
-| `pgo_install_client`              | true        | Configures the playbooks to install the `pgo` client if set to true.                                                                                                             |
+| `pgo_client_install`              | true        | Configures the playbooks to install the `pgo` client if set to true.                                                                                                             |
 | `pgo_image_prefix`                | crunchydata | Configures the image prefix used when creating containers for the Crunchy PostgreSQL Operator (apiserver, operator, scheduler..etc).                                             |
 | `pgo_image_tag`                   |             | Configures the image tag used when creating containers for the Crunchy PostgreSQL Operator (apiserver, operator, scheduler..etc)                                                 |
 | `pgo_namespace`                   |             | Set to configure the namespace where Operator will be deployed.                                                                                                                  |
@@ -59,6 +66,10 @@ The following are the variables available for configuration:
 | `pgo_tls_no_verify`               |             | Set to configure Operator to verify TLS certificates.                                                                                                                            |
 | `pgo_username`                    | admin       | Configures the pgo administrator username.                                                                                                                                       |
 | `primary_storage`                 | storage2    | Set to configure which storage definition to use when creating volumes used by PostgreSQL primaries on all newly created clusters.                                               |
+| `prometheus_install`              | true        | Set to true to install Crunchy Prometheus timeseries database.                                                                                                                   |
+| `prometheus_storage_access_mode`  |             | Set to the access mode used by the configured storage class for Prometheus persistent volumes.                                                                                   |
+| `prometheus_storage_class_name`   |             | Set to the name of the storage class used when creating Prometheus persistent volumes.                                                                                           |
+| `grafana_volume_size`             |             | Set to the size of persistent volume to create for Grafana.                                                                                                                      |
 | `replica_storage`                 | storage3    | Set to configure which storage definition to use when creating volumes used by PostgreSQL replicas on all newly created clusters.                                                |
 | `scheduler_timeout`               | 3600        | Set to a value in seconds to configure the `pgo-scheduler` timeout threshold when waiting for schedules to complete.                                                             |
 | `service_type`                    | ClusterIP   | Set to configure the type of Kubernetes service provisioned on all newly created clusters.                                                                                       |
@@ -191,3 +202,22 @@ target_namespaces='pgo2,pgo3'
 
 Each install of the operator will create a corresponding directory in `$HOME/.pgo/<PGO NAMESPACE>` which will contain 
 the TLS and `pgouser` client credentials.
+
+## Deploying Grafana and Prometheus
+
+PostgreSQL clusters created by the operator can be configured to create additional containers for collecting metrics.  
+These metrics are very useful for understanding the overall health and performance of PostgreSQL database deployments 
+over time.  The collectors included by the operator are:
+
+* Node Exporter - Host metrics where the PostgreSQL containers are running
+* PostgreSQL Exporter - PostgreSQL metrics
+
+The operator, however, does not install the neccessary timeseries database (Prometheus) for storing the collected 
+metrics or the front end visualization (Grafana) of those metrics.
+
+Included in these playbooks are roles for deploying Granfana and/or Prometheus.  See the `inventory` file 
+for options to install the metrics stack.
+
+{{% notice tip %}}
+At this time the Crunchy PostgreSQL Operator Playbooks only support storage classes.
+{{% /notice %}}
