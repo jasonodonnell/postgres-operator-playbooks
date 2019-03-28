@@ -68,17 +68,3 @@
   ignore_errors: no
   no_log: false
   tags: [install, upgrade]
-
-- name: Check if PGUpgrades CRD Is Installed
-  shell: "{{ kubectl_or_oc }} get crd pgupgrades.crunchydata.com"
-  register: crds_result
-  ignore_errors: yes
-  no_log: true
-  tags: [install, upgrade]
-
-- name: Create PGUpgrades CRD
-  command: "{{ kubectl_or_oc }} create -f ./roles/operator/files/crds/pgupgrades-crd.yaml -n {{ pgo_namespace }}"
-  when: crds_result.rc == 1
-  ignore_errors: no
-  no_log: false
-  tags: [install, upgrade]

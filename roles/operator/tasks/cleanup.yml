@@ -144,7 +144,7 @@
 
 - name: Delete existing Custom Objects
   shell: |
-    {{ kubectl_or_oc }} delete pgbackups,pgclusters,pgpolicies,pgreplicas,pgtasks,pgupgrades -n {{ pgo_namespace }} --all
+    {{ kubectl_or_oc }} delete pgbackups,pgclusters,pgpolicies,pgreplicas,pgtasks -n {{ pgo_namespace }} --all
   with_items:
   - "{{ all_namespaces }}"
   ignore_errors: yes
