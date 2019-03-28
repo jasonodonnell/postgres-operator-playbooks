@@ -36,6 +36,11 @@ hrefTargetBlank = true
 home = [ "HTML", "RSS", "JSON"]
 
 [[menu.shortcuts]]
+name = "<label>Overview</label>"
+url = "/"
+weight = 1
+
+[[menu.shortcuts]]
 name = "<i class='fab fa-github'></i> <label>Source</label>"
 url = "https://github.com/CrunchyData/postgres-operator-playbooks"
 weight = 10
