@@ -28,8 +28,7 @@
   shell: |
     {{ kubectl_or_oc }} delete secret pgo-backrest-repo-config -n {{ item }}
   with_items:
-  - "{{ pgo_namespace }}"
-  - "{{ target_namespaces.split(',') }}"
+  - "{{ all_namespaces }}"
   ignore_errors: yes
   no_log: false
   tags:
