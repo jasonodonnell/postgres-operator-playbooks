@@ -30,7 +30,7 @@ With the Windows Command Prompt open, paste the following command into the promp
 --quiet-mode ^
 --arch x86 ^
 --verbose ^
---packages binutils,curl,cygwin32-gcc-g++,gcc-g++,git,gmp,libffi-devel,libgmp-devel,libsodium-devel,make,nano,openssh,libcrypt-devel,openssl,openssl-devel,python36,python36-pip,python36-setuptools,python36-devel,python36-crypto,python3-cryptography,vim,unzip,wget
+--packages binutils,curl,cygwin32-gcc-g++,gcc-g++,git,gmp,libffi-devel,libgmp-devel,libsodium-devel,make,nano,openssh,libcrypt-devel,openssl,openssl-devel,python36,python36-pip,python36-setuptools,python36-devel,python36-crypto,python36-cryptography,vim,unzip,wget
 ```
 
 ### Setting Up Cygwin Environment
@@ -77,7 +77,7 @@ chmod +x /usr/local/bin/kubectl
 
 ### Install `oc` in Cygwin
 
-If the Crunchy PostgreSQL Operator will be deployed to a Kubernetes cluster, we
+If the Crunchy PostgreSQL Operator will be deployed to an OpenShift cluster, we
 will require `oc`
 
 To download `oc` run the following commands:
