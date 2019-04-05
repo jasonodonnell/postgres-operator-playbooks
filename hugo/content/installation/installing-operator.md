@@ -36,21 +36,14 @@ ansible-playbook -i /path/to/inventory main.yml --tags=install --ask-become-pass
 
 ## Installing on Windows
 
-On a Windows host with a Cygwin terminal we can run the following commands to install 
+On a Windows host with an Ubuntu subsystem we can run the following commands to install 
 the PostgreSQL Operator.
-
-First, run the following command to setup the `ansible_python_interpreter` for 
-Cygwin:
-
-```bash
-sed -i 's~/usr/bin/env python~/usr/bin/env.exe python3.6~g' /path/to/inventory
-```
 
 The following command should be run from the directory where the
 `postgres-operator-playbooks` project is located:
 
 ```bash
-ansible-playbook -i /path/to/inventory main.yml --tags=install
+ansible-playbook -i /path/to/inventory main.yml --tags=install --ask-become-pass
 ```
 
 ## Verifying the Installation
@@ -73,45 +66,18 @@ oc get pods -n <NAMESPACE_NAME>
 After the Crunchy PostgreSQL Operator has successfully been installed we will need 
 to configure local environment variables before using the `pgo` client.
 
-### Linux and MacOS
-
-To configure the environment variables used by `pgo` on a Linux or MacOS host, 
-run the following command:
+To configure the environment variables used by `pgo` run the following command:
 
 Note: `<PGO_NAMESPACE>` should be replaced with the namespace the Crunchy PostgreSQL
 Operator was deployed to.
 
 ```bash
 cat <<EOF >> ~/.bashrc
-export PGOUSER="~/.pgo/<PGO_NAMESPACE>/pgouser"
-export PGO_CA_CERT="~/.pgo/<PGO_NAMESPACE>/client.crt"
-export PGO_CLIENT_CERT="~/.pgo/<PGO_NAMESPACE>/client.crt"
-export PGO_CLIENT_KEY="~/.pgo/<PGO_NAMESPACE>/client.pem"
-export PGO_APISERVER_URL=https://127.0.0.1:8443
-EOF
-```
-
-Apply those changes to the current session by running:
-
-```bash
-source ~/.bashrc
-```
-
-### Windows (Cygwin)
-
-To configure the environment variables used by `pgo` on a Windows (Cygwin) host,
-run the following command:
-
-Note: `<PGO_NAMESPACE>` should be replaced with the namespace the Crunchy PostgreSQL 
-Operator was deployed to.
-
-```bash
-cat <<EOF >> ~/.bashrc
-export PGOUSER="$(cygpath -w ~/.pgo/<PGO_NAMESPACE>/pgouser)"
-export PGO_CA_CERT="$(cygpath -w ~/.pgo/<PGO_NAMESPACE>/client.crt)"
-export PGO_CLIENT_CERT="$(cygpath -w ~/.pgo/<PGO_NAMESPACE>/client.crt)"
-export PGO_CLIENT_KEY="$(cygpath -w ~/.pgo/<PGO_NAMESPACE>/client.pem)"
-export PGO_APISERVER_URL="https://127.0.0.1:8443"
+export PGOUSER="${HOME?}/.pgo/<PGO_NAMESPACE>/pgouser"
+export PGO_CA_CERT="${HOME?}/.pgo/<PGO_NAMESPACE>/client.crt"
+export PGO_CLIENT_CERT="${HOME?}/.pgo/<PGO_NAMESPACE>/client.crt"
+export PGO_CLIENT_KEY="${HOME?}/.pgo/<PGO_NAMESPACE>/client.pem"
+export PGO_APISERVER_URL='https://127.0.0.1:8443'
 EOF
 ```
 

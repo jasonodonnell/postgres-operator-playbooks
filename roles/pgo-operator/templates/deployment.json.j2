@@ -24,6 +24,15 @@
                                 "containerPort": 8443
                             }
                         ],
+                        "livenessProbe": {
+                            "httpGet": {
+                                "port": 8443,
+                                "path": "/health",
+                                "scheme": "HTTPS"
+                            },
+                            "initialDelaySeconds": 4,
+                            "periodSeconds": 5
+                        },
                         "env": [
                             {
                                 "name": "CRUNCHY_DEBUG",
@@ -62,6 +71,16 @@
                         "name": "operator",
                         "image": "{{ pgo_image_prefix }}/postgres-operator:{{ pgo_image_tag }}",
                         "imagePullPolicy": "IfNotPresent",
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "ls",
+                                    "/tmp"
+                                ]
+                            },
+                            "initialDelaySeconds": 4,
+                            "periodSeconds": 5
+                        },
                         "env": [
                             {
                                 "name": "CRUNCHY_DEBUG",
@@ -93,6 +112,16 @@
                     {
                         "name": "scheduler",
                         "image": "{{ pgo_image_prefix }}/pgo-scheduler:{{ pgo_image_tag }}",
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "ls",
+                                    "/tmp"
+                                ]
+                            },
+                            "initialDelaySeconds": 4,
+                            "periodSeconds": 5
+                        },
                         "env": [
                             {
                                 "name": "PGO_OPERATOR_NAMESPACE",

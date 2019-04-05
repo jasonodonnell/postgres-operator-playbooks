@@ -127,14 +127,12 @@
       command: |
         {{ kubectl_or_oc }} create secret generic pgo-backrest-repo-config \
           --from-file=authorized_keys='{{ output_dir }}/authorized_keys' \
-          --from-file=config='./roles/operator/files/pgo-backrest-repo/config' \
+          --from-file=config='{{ role_path }}/files/pgo-backrest-repo/config' \
           --from-file=id_rsa='{{ output_dir }}/id_rsa' \
-          --from-file=ssh_host_ecdsa_key='{{ output_dir }}/ssh_host_ecdsa_key' \
-          --from-file=ssh_host_ed25519_key='{{ output_dir }}/ssh_host_ed25519_key' \
           --from-file=ssh_host_rsa_key='{{ output_dir }}/ssh_host_rsa_key' \
-          --from-file=sshd_config='./roles/operator/files/pgo-backrest-repo/sshd_config' \
+          --from-file=sshd_config='{{ role_path }}/files/pgo-backrest-repo/sshd_config' \
           --from-file=aws-s3-credentials.yaml='{{ output_dir }}/aws-s3-credentials.yaml' \
-          --from-file=aws-s3-ca.crt='./roles/operator/files/pgo-backrest-repo/aws-s3-ca.crt' \
+          --from-file=aws-s3-ca.crt='{{ role_path }}/files/pgo-backrest-repo/aws-s3-ca.crt' \
           -n {{ item }}
       with_items:
       - "{{ all_namespaces }}"
@@ -153,13 +151,13 @@
         {{ kubectl_or_oc }} create configmap pgo-config \
           --from-file=pgo.yaml='{{ output_dir }}/pgo.yaml' \
           --from-file=pgouser='{{ output_dir }}/pgouser' \
-          --from-file='./roles/operator/files/pgo-configs' \
+          --from-file='{{ role_path }}/files/pgo-configs' \
           -n {{ pgo_namespace }}
       tags: [install, upgrade]
 
     - name: Create PGO Service
       command: |
-        {{ kubectl_or_oc }} create --filename='./roles/operator/files/service.json' -n {{ pgo_namespace }}
+        {{ kubectl_or_oc }} create --filename='{{ role_path }}/files/service.json' -n {{ pgo_namespace }}
       tags: [install, upgrade]
 
     - name: Template PGO Deployment

@@ -12,7 +12,18 @@ The following is required prior to installing PostgreSQL Operator using Ansible:
 * Ansible 2.4.6+
 * Kubernetes v1.11+ or OpenShift v3.09+
 * `kubectl` or `oc` configured to communicate with Kubernetes
+* Cluster Admin privileges in Kubernetes/OpenShift
 * `postgres-operator-playbooks` source code checked out for the target version
+
+## Permissions
+
+The installation of the Crunchy PostgreSQL Operator requires elevated privileges.  
+It is required that the playbooks are run as a `cluster-admin` to ensure the playbooks 
+can install:
+
+* Custom Resource Definitions
+* Cluster RBAC
+* Create required namespaces
 
 ## Configuring the Inventory File
 
@@ -62,13 +73,13 @@ The following are the variables available for configuration:
 | `openshift_skip_tls_verify`       |             | When deploying to Openshift, set to ignore the integrity of TLS certificates for the OpenShift cluster.                                                                          |
 | `openshift_token`                 |             | When deploying to OpenShift, set to configure the token used for login (when not using username/password authentication).                                                        |
 | `openshift_user`                  |             | When deploying to OpenShift, set to configure the username used for login.                                                                                                       |
+| `pgo_admin_username`              | admin       | Configures the pgo administrator username.                                                                                                                                       |
+| `pgo_admin_password`              |             | Configures the pgo administrator password.                                                                                                                                       |
 | `pgo_client_install`              | true        | Configures the playbooks to install the `pgo` client if set to true.                                                                                                             |
 | `pgo_image_prefix`                | crunchydata | Configures the image prefix used when creating containers for the Crunchy PostgreSQL Operator (apiserver, operator, scheduler..etc).                                             |
 | `pgo_image_tag`                   |             | Configures the image tag used when creating containers for the Crunchy PostgreSQL Operator (apiserver, operator, scheduler..etc)                                                 |
 | `pgo_namespace`                   |             | Set to configure the namespace where Operator will be deployed.                                                                                                                  |
-| `pgo_password`                    |             | Configures the pgo administrator password.                                                                                                                                       |
 | `pgo_tls_no_verify`               |             | Set to configure Operator to verify TLS certificates.                                                                                                                            |
-| `pgo_username`                    | admin       | Configures the pgo administrator username.                                                                                                                                       |
 | `primary_storage`                 | storage2    | Set to configure which storage definition to use when creating volumes used by PostgreSQL primaries on all newly created clusters.                                               |
 | `prometheus_install`              | true        | Set to true to install Crunchy Prometheus timeseries database.                                                                                                                   |
 | `prometheus_storage_access_mode`  |             | Set to the access mode used by the configured storage class for Prometheus persistent volumes.                                                                                   |
@@ -85,6 +96,15 @@ The following are the variables available for configuration:
 | `storage<ID>_type`                |             | Set to either `create` or `dynamic` to configure the operator to create persistent volumes or have them created dynamically by a storage class.                                  |
 | `target_namespaces`               |             | Set to a comma delimited string of all the namespaces Operator will manage.                                                                                                      |
 | `xlog_storage`                    | storage1    | Set to configure which storage definition to use when creating volumes used to store Write Ahead Logs (WAL) archives on all newly created clusters.                              |
+
+
+{{% notice tip %}}
+To retrieve the `kubernetes_context` value for Kubernetes installs, run the following command:
+
+```bash
+kubectl config current-context
+```
+{{% /notice %}}
 
 ## Storage
 
@@ -118,7 +138,7 @@ of storage classes.
 
 #### Generic Storage Class
 
-To setup storage1 to use a the storage class `fast`
+To setup storage1 to use the storage class `fast`
 
 ```ini
 storage1_access_mode='ReadWriteOnce'

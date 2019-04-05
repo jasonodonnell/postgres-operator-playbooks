@@ -6,8 +6,8 @@
   with_items:
     - pgo_namespace
     - target_namespaces
-    - pgo_username
-    - pgo_password
+    - pgo_admin_username
+    - pgo_admin_password
     - ccp_image_prefix
     - ccp_image_tag
     - pgo_image_prefix
