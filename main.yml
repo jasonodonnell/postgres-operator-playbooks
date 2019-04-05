@@ -5,6 +5,6 @@
     all_namespaces: []
   gather_facts: true
   roles:
-    - preflight 
-    - operator
-    - metrics
+    - pgo-preflight 
+    - pgo-operator
+    - pgo-metrics
