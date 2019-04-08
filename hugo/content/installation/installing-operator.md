@@ -34,7 +34,7 @@ The following command should be run from the directory where the
 ansible-playbook -i /path/to/inventory main.yml --tags=install --ask-become-pass
 ```
 
-## Installing on Windows
+## Installing on Windows Ubuntu Subsystem
 
 On a Windows host with an Ubuntu subsystem we can run the following commands to install 
 the PostgreSQL Operator.

@@ -7,13 +7,30 @@ weight: 20
 
 # Prerequisites
 
-The following is required prior to installing PostgreSQL Operator using Ansible:
+The following is required prior to installing Crunchy PostgreSQL Operator using Ansible:
 
+* [postgres-operator-playbooks](https://github.com/CrunchyData/postgres-operator-playbooks) source code for the target version
 * Ansible 2.4.6+
-* Kubernetes v1.11+ or OpenShift v3.09+
-* `kubectl` or `oc` configured to communicate with Kubernetes
-* Cluster Admin privileges in Kubernetes/OpenShift
-* `postgres-operator-playbooks` source code checked out for the target version
+
+## Kubernetes Installs
+
+* Kubernetes v1.11+
+* Cluster admin privileges in Kubernetes
+* [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) configured to communicate with Kubernetes
+
+## OpenShift Installs
+
+* OpenShift v3.09+
+* Cluster admin privileges in OpenShift
+* [oc](https://docs.openshift.com/container-platform/3.11/cli_reference/get_started_cli.html) configured to communicate with OpenShift
+
+## Installing from a Windows Host
+
+If the Crunchy PostgreSQL Operator is being installed from a Windows host the following 
+are required:
+
+* [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+* [Ubuntu for Windows](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6)
 
 ## Permissions
 
