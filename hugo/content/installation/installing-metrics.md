@@ -36,15 +36,8 @@ ansible-playbook -i /path/to/inventory main.yml --tags=install-metrics
 
 ## Installing on Windows
 
-On a Windows host with a Cygwin terminal we can run the following commands to install 
+On a Windows host with the Ubuntu subsystem we can run the following commands to install 
 the Metrics stack:
-
-First, run the following command to setup the `ansible_python_interpreter` for 
-Cygwin:
-
-```bash
-sed -i 's~/usr/bin/env python~/usr/bin/env.exe python3.6~g' /path/to/inventory
-```
 
 The following command should be run from the directory where the
 `postgres-operator-playbooks` project is located:

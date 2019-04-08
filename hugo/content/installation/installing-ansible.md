@@ -5,12 +5,10 @@ draft: false
 weight: 30
 ---
 
-## Installing Ansible on Linux or MacOS
+## Installing Ansible on Linux, MacOS or Windows Ubuntu Subsystem
 
-To install Ansible on Linux or MacOS, [see the official documentation](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-control-machine)
- provided by Ansible.
-
-## Installing Ansible on Windows (Ubuntu Subsystem)
+To install Ansible on Linux or MacOS, [see the official documentation](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#intro-installation-guide) 
+provided by Ansible.
 
 ## Install Google Cloud SDK (Optional)
 
