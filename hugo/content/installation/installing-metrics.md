@@ -8,7 +8,7 @@ weight: 40
 # Installing
 
 The following assumes the proper [prerequisites are satisfied](/getting-started/prerequisites)
-we can now install the PostgreSQL Operator.
+we can now install the Grafana and Prometheus services.
 
 ## Installing on Linux
 
